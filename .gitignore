@@ -1,23 +1,41 @@
 # Keil build outputs
-Objects/
-Listings/
-*.o
-*.d
-*.crf
-*.axf
-*.lnp
-*.dep
-*.map
-*.lst
-*.htm
+stm32/Objects/
+stm32/Listings/
+stm32/*.o
+stm32/*.d
+stm32/*.crf
+stm32/*.axf
+stm32/*.lnp
+stm32/*.dep
+stm32/*.map
+stm32/*.lst
+stm32/*.htm
 
 # Debug / RTE generated configs
-DebugConfig/
-RTE/Device/
+stm32/DebugConfig/
+stm32/RTE/Device/
 
 # User IDE settings
-project.uvoptx
-project.uvguix.*
+stm32/project.uvoptx
+stm32/project.uvguix.*
+
+# Android
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+android/.vscode/
+android/captures/
+android/.externalNativeBuild/
+
+# Maven / Java (pulsar SDK)
+pulsar/target/
+pulsar/logs/
+pulsar/*.log
+pulsar/*.jar
+pulsar/*.class
+pulsar/.idea/
 
 # VS Code logs
 .vscode/keil-assistant.log

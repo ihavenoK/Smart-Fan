@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">CMIoT MQTT连接</string>
+    <string name="device_name_hint">输入设备名称（如：sensor_001）</string>
+    <string name="connect_button">连接MQTT服务</string>
+    <string name="status_unconnected">状态：未连接</string>
+    <string name="status_connecting">状态：正在连接...</string>
+    <string name="status_connected">状态：✅ 连接成功！设备: %s</string>
+    <string name="status_error">状态：❌ 连接失败: %s</string>
+</resources>
