@@ -70,13 +70,13 @@ static void Menu_ProcessEvent(EncoderMsg *msg)
     /*------ PAGE_HOME：主页面 ------*/
     case PAGE_HOME:
         if (msg->event == ENCODER_CW || msg->event == ENCODER_CCW) {
-            /* 仅在手动模式下旋转调风速（步进 5%） */
+            /* 仅在手动模式下旋转调风速（步进 1%） */
             if (g_SystemState.mode == MODE_MANUAL) {
                 speed = g_SystemState.targetSpeed;
                 if (msg->event == ENCODER_CW)
-                    speed += 5;
+                    speed += 1;
                 else
-                    speed -= 5;
+                    speed -= 1;
 
                 if (speed > 100) speed = 100;
                 if (speed < 0)   speed = 0;

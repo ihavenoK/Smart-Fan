@@ -34,16 +34,23 @@ void vTaskMotor(void *pvParameters)
             currentSpeed--;
         }
 
-        /* 3. 写入硬件 */
+        /* 3. 设置方向：速度 > 0 时正转，= 0 时刹车 */
+        if (currentSpeed > 0) {
+            Motor_SetDirection(MOTOR_FORWARD);
+        } else {
+            Motor_SetDirection(MOTOR_BRAKE);
+        }
+
+        /* 4. 写入 PWM 速度 */
         Motor_SetSpeed(currentSpeed);
 
-        /* 4. 更新全局状态中的实际速度 */
+        /* 5. 更新全局状态中的实际速度 */
         if (xSemaphoreTake(xSystemMutex, pdMS_TO_TICKS(10)) == pdTRUE) {
             g_SystemState.currentSpeed = currentSpeed;
             xSemaphoreGive(xSystemMutex);
         }
 
-        /* 5. 精确 50ms 周期 */
+        /* 6. 精确 50ms 周期 */
         vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(50));
     }
 }

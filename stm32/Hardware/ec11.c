@@ -62,7 +62,16 @@ void EC11_Init(void)
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(EC11_A_GPIO_PORT, &GPIO_InitStructure);
 
-    /* 3. 将 EXTI 线映射到 GPIO 端口 */
+    /* 3. 检测编码器是否物理连接
+     *    如果三引脚全为高（IPU 默认电平），说明无外设驱动，大概率硬件未连接。
+     *    此时跳过 EXTI 中断配置，编码器任务通过 5ms 轮询仍可正常工作（延迟略增）。
+     *    注意：编码器静止时 A/B 自然为高，可能误判为未连接，但仅影响 EXTI，
+     *          轮询保底确保功能完整。 */
+    if (EC11_A_READ() && EC11_B_READ() && EC11_SW_READ()) {
+        return;   /* 未检测到编码器 → 跳过 EXTI，仅保留 GPIO 配置供轮询使用 */
+    }
+
+    /* 4. 将 EXTI 线映射到 GPIO 端口 */
     GPIO_EXTILineConfig(GPIO_PortSourceGPIOA, GPIO_PinSource7);  /* A 相 */
     GPIO_EXTILineConfig(GPIO_PortSourceGPIOA, GPIO_PinSource6);  /* B 相 */
     GPIO_EXTILineConfig(GPIO_PortSourceGPIOA, GPIO_PinSource5);  /* SW   */

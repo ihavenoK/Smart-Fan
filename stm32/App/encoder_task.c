@@ -24,9 +24,6 @@
   */
 #include "tasks.h"
 #include "ec11.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
 
 /* 队列句柄（在 main.c 中定义） */
 extern QueueHandle_t xEncoderQueue;
@@ -75,8 +72,12 @@ void vTaskEncoder(void *pvParameters)
     /*--- 按键变量 ---*/
     uint8_t    sw_stable     = 1;   /* 消抖后稳定电平（上拉，默认 1=松开） */
     uint8_t    sw_counter    = 0;   /* 消抖计数器 */
+    uint8_t    sw_pressed    = 0;   /* 按键按下标志：1=确认按住中，与 sw_stable 解耦 */
     TickType_t sw_press_tick = 0;   /* 确认按下的时刻 */
     uint8_t    sw_long_sent  = 0;   /* 长按事件是否已发送，防止重复 */
+
+    /* 初始化基线：记录当前 tick，避免 0 值在边界条件下的风险 */
+    sw_press_tick = xTaskGetTickCount();
 
     (void)pvParameters;
 
@@ -122,6 +123,10 @@ void vTaskEncoder(void *pvParameters)
          *
          *   原理：采样与稳定值不同时递增计数，相同时清零。
          *         计数达到阈值确认翻转。单次毛刺无法翻转状态。
+         *
+         *   改进：引入 sw_pressed 独立标志，长按检测不依赖
+         *         sw_stable==0（防止噪声导致 sw_stable 误翻转后
+         *         长按条件被意外跳过）。
          *==========================================================*/
         {
             uint8_t sw_raw = EC11_SW_READ();
@@ -136,14 +141,16 @@ void vTaskEncoder(void *pvParameters)
 
                     if (sw_stable == 0) {
                         /* ---- 确认按下 ---- */
+                        sw_pressed    = 1;
                         sw_press_tick = xTaskGetTickCount();
                         sw_long_sent  = 0;
                     } else {
                         /* ---- 确认松开 ---- */
+                        sw_pressed = 0;
                         if (!sw_long_sent) {
                             /* 3秒内松开 → 短按 */
                             msg.event = ENCODER_SHORT;
-                            xQueueSend(xEncoderQueue, &msg, 0);
+                            xQueueSend(xEncoderQueue, &msg, pdMS_TO_TICKS(10));
                         }
                         /* 已发送过长按 → 松开时不再重复 */
                     }
@@ -153,12 +160,12 @@ void vTaskEncoder(void *pvParameters)
                 sw_counter = 0;
             }
 
-            /* ---- 长按检测（每次轮询都检查，不需等松开） ---- */
-            if (sw_stable == 0 && !sw_long_sent) {
+            /* ---- 长按检测：独立于消抖逻辑，使用 sw_pressed 标志 ---- */
+            if (sw_pressed && !sw_long_sent) {
                 if ((xTaskGetTickCount() - sw_press_tick)
                         >= pdMS_TO_TICKS(LONG_PRESS_MS)) {
                     msg.event = ENCODER_LONG;
-                    xQueueSend(xEncoderQueue, &msg, 0);
+                    xQueueSend(xEncoderQueue, &msg, pdMS_TO_TICKS(10));
                     sw_long_sent = 1;
                 }
             }

@@ -91,7 +91,6 @@ public class IoTPulsarConsume {
 
             JSONObject subData = originalJson.getJSONObject("subData");
             String deviceName = subData.getString("deviceName");
-            String productId = subData.getString("productId");
             JSONObject params = subData.getJSONObject("params"); // 属性值，格式如 {"LED":{"value":1},"temp":{"value":25},"humi":{"value":60}}
 
             // 提取需要同步的属性值（简化处理：直接取 params 中的每个属性的 value）
@@ -159,6 +158,7 @@ public class IoTPulsarConsume {
      * @param properties 要查询的属性数组
      * @return 属性值的Map，如果失败返回null
      */
+    @SuppressWarnings("unused")
     private static Map<String, Object> queryDevicePropertyDetail(String productId, String deviceName, String[] properties) {
         try {
             String url = "https://iot-api.heclouds.com/thingmodel/query-device-property-detail";

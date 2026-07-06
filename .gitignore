@@ -18,6 +18,7 @@ stm32/RTE/Device/
 # User IDE settings
 stm32/project.uvoptx
 stm32/project.uvguix.*
+stm32/.vscode/
 
 # Android
 android/.gradle/
@@ -37,7 +38,8 @@ pulsar/*.jar
 pulsar/*.class
 pulsar/.idea/
 
-# VS Code logs
-.vscode/keil-assistant.log
-.vscode/uv4.log
-.vscode/uv4.log.lock
+# VS Code settings (entire folder, machine-specific)
+.vscode/
+
+# Agent / tool memory
+.workbuddy/

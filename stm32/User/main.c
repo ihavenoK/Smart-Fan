@@ -139,7 +139,7 @@ static void CreateAllTasks(void)
     ret = xTaskCreate(
         vTaskMenu,
         "Menu",
-        configMINIMAL_STACK_SIZE * 4,
+        configMINIMAL_STACK_SIZE * 2,
         NULL,
         2,
         &xMenuTaskHandle
@@ -161,7 +161,7 @@ static void CreateAllTasks(void)
     ret = xTaskCreate(
         vTaskDisplay,
         "Display",
-        configMINIMAL_STACK_SIZE * 4,
+        configMINIMAL_STACK_SIZE * 2,
         NULL,
         1,
         &xDisplayTaskHandle
